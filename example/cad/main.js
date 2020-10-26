@@ -94,7 +94,12 @@ function bindMouseOper(points) {
 function bindUpdate({points, lines}) {
   points.forEach(point => {
 
-    point.api.listen('x', () => point.x > -critical[0] && point.x < critical[1])
+    point.api.listen('x', () => {
+      let ret = point.x > -critical[0] && point.x < critical[1]
+
+      console.log(ret)
+      return ret
+    })
 
     // 响应数值变化
     point.api.update('x', () => point.dom.setAttribute('cx', point.x))
