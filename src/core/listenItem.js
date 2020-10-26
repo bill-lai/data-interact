@@ -1,6 +1,7 @@
 import { namesManage, SPLICE } from '../global'
 import { getNameJoinEvents } from '../util'
 import eventManage from './eventManage'
+import recurRetro from './recurRetro'
 
 
 // 单独封装每一项

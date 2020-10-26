@@ -142,33 +142,40 @@ export default (deposit) => {
   // 缓冲时入栈
   let keyFns = {}
 
+  const resulut = (resolve, listNames, success) => {
+    resolve(success)
+
+    // 销栈，依次通知
+    let keys = Object.keys(keyFns)
+    while (keys.length) {
+      let fns = keyFns[keys.shift()] 
+      while (fns.length) fns.shift()(success)
+    }
+
+    // 如果确定修改则通知修改
+    success && updateHandle(listNames, deposit)
+
+    // 删除缓存
+    for (let key in deposit) delete deposit[key]
+
+    // 结束缓冲
+    runStatus = 0
+    console.log('end')
+  }
+
   const handle = async (key, listNames, resolve, alreadyNames) => {
     // 通知，以返回结果确定是否需要修改
     let achieve = await mutualManage(listNames, deposit, alreadyNames)
 
     // 如果不是半完成则通知修改
     if (achieve.ret !== NOFINISHED) {
-      let success = achieve.ret === SUCCESS
-
-      resolve(success)
-
-      // 销栈，依次通知
-      let keys = Object.keys(keyFns)
-      while (keys.length) {
-        let fns = keyFns[keys.shift()] 
-        while (fns.length) fns.shift()(success)
-      }
-      
-      // 如果确定修改则通知修改
-      success && updateHandle(listNames, deposit)
-
-      // 删除缓存
-      for (let key in deposit) delete deposit[key]
-
-      // 结束缓冲
-      runStatus = 0
-
+      resulut(
+        resolve,
+        listNames,
+        achieve.ret === SUCCESS
+      )
     } else {
+      // console.log('----')
       // 记录已经检测过的
       let nalreadyNames = alreadyNames.concat(achieve.already)
       
@@ -176,26 +183,37 @@ export default (deposit) => {
       let fns = keyFns[ckey]
 
       // 通知不允许修改的key 
+        console.log('-------aaaa--------', ckey, key, keyFns)
       if (fns) {
         delete keyFns[ckey]
         while (fns.length) fns.shift()(false)
         delete deposit[ckey]
+        console.log('---------------')
       }
+
+      console.log('........')
 
       // 如果是当前的修改失败了
       if (key === ckey) {
-        resolve(false)
+        console.log('....1111111....')
         delete keyFns[ckey]
         delete deposit[ckey]
 
         let keys = Object.keys(keyFns)
+
         if (keys.length === 0) {
-          return;
+          return resulut(resolve, listNames, false);
         } else {
-          key = keys[0]
-          resolve = keyFns[keys[0]].shift()
+          resolve(false)
+
+          let fnArr = keyFns[keys[0]]
+          resolve = fnArr.shift()
+          fnArr.length === 0 && delete keyFns[keys[0]]
         }
       }
+
+      
+      console.log('&&&&&&&&&&&')
 
       // 继续通知
       handle(key, listNames, resolve, nalreadyNames)
@@ -207,12 +225,15 @@ export default (deposit) => {
     if (!runStatus) {
       // 开始缓冲
       runStatus = 1
+      console.log('start')
       return new Promise(resolve => setTimeout(() => handle(key, listNames, resolve, [])))
     } else {
       return new Promise(resolve => {
         // 缓冲时入栈
+        console.log('init', key)
         if (!keyFns[key]) keyFns[key] = []
         keyFns[key].push(resolve)
+        console.log('init end')
       })
     }
   }

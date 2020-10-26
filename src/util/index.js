@@ -43,3 +43,7 @@ export const getNameJoinEvents = (currentListName) => {
 
   return parentValue
 }
+
+export const isDOM = typeof HTMLElement === 'object' ? 
+  obj => obj instanceof HTMLElement :
+  obj => obj && typeof obj === 'object' && obj.nodeType === 1 && typeof obj.nodeName === 'string'
