@@ -1,7 +1,8 @@
 import { namesManage, SPLICE } from '../global'
-import { getNameJoinEvents } from '../util'
+import { getNameJoinEvents, isDOM } from '../util'
 import eventManage from './eventManage'
 import recurRetro from './recurRetro'
+
 
 
 // 单独封装每一项
@@ -13,14 +14,15 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
       const listNames = namesManage.get(proxy)
 
       if (value === target[key]) return;
-      if (!listNames || listNames.length === 0) return target[key] = value
+      if (!listNames || listNames.length === 0 || isDOM(value)) 
+        return target[key] = value
 
 
       mutualHandle(listNames, key, value)
         .then(ret => {
-          if (!ret) return ;
+          if (!ret) return;
 
-          // 如果确定修改则通知
+          // 如果卸下原来的代理
           if (namesManage.has(target[key])) {
             unListenItem(target[key], key, currentListName)
           }

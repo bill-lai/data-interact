@@ -7,6 +7,7 @@ const getName = (prefix, key) => prefix + SPLICE + key
 
 // 所有对象转成代理
 const recurRetro = (prefix, base, events = [], key) => {
+  // 如果是dom则不监听
   if (isDOM(base)) return base;
 
   const name = key ? getName(prefix, key) : prefix
@@ -15,7 +16,6 @@ const recurRetro = (prefix, base, events = [], key) => {
   for (let key in base) {
     if (base[key] instanceof Object) {
       // 封装成代理
-      console.log(key)
       base[key] = recurRetro(name, base[key], events, key)
     }
   }

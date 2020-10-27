@@ -9,6 +9,8 @@ const NOFINISHED = 3
 // 通过事件获取最后一个后缀
 const getLastName = name => name.substr(name.lastIndexOf(SPLICE) + SPLICE.length)
 
+
+
 // 组合事件与key需要监听的事件，并合并所需事件，并组合参数
 const combination = (names, deposit) => {
   let rets = []
@@ -92,10 +94,14 @@ const mutualManage = (() => {
           if (emitArgs[i].type === OBJEVENT || emitArgs.length === i + 1) {
             return { ret: ERROR };
           } else if (emitArgs[i].type === KEYEVENT) {
-            let already = emitArgs.splice(0, i + 1).map(({name}) => name)
             let attr = getLastName(emitArgs[i].name)
+            let already = emitArgs.splice(0, i + 1).map(({name}) => name)
 
-             
+            emitArgs.forEach(item => {
+              if (getLastName(item.name) === attr) {
+                already.push(item.name)
+              }
+            })
 
             return { ret: NOFINISHED,  already }
           }
@@ -122,18 +128,11 @@ const mutualManage = (() => {
 
 // 完成修改通知
 const updateHandle = (() => {
-  const fns = []
 
   return (names, deposit) => {
     names = combination(names.map(({name}) => name), deposit)
-
     names.forEach(({name}) => {
-      if (!~fns.indexOf(name)) {
-        setTimeout(() => {
-          ResponsiveEvent.trigger(`${name}${UPDATE}`)
-          fns.splice(fns.indexOf(name), 1)
-        })
-      }
+      ResponsiveEvent.trigger(`${name}${UPDATE}`)
     })
   }
 })();
@@ -146,20 +145,26 @@ export default (deposit) => {
   let runStatus = 0
   // 缓冲时入栈
   let keyFns = {}
+  // 正在检测进行时
+  let checkStatus = 0
+  // 等待中的修改
+  let readyFns = []
+
 
   const resulut = (key, resolve, listNames, success) => {
-    success && console.log('enenen?', key, success)
     resolve(success)
 
     // 销栈，依次通知
     let keys = Object.keys(keyFns)
     while (keys.length) {
-      let key = keys.shift()
+      let key = keys[0]
+      keys.shift()
       let fns = keyFns[key] 
       while (fns.length) fns.shift()(success)
       delete keyFns[key]
     }
 
+    deposit.x > 300 && console.log(deposit.x)
     // 如果确定修改则通知修改
     success && updateHandle(listNames, deposit)
 
@@ -168,11 +173,16 @@ export default (deposit) => {
 
     // 结束缓冲
     runStatus = 0
+    // 结束检测
+    checkStatus = 0
+    // 执行等待中的函数
+    while (readyFns.length) readyFns.shift()();
   }
 
   const handle = async (key, listNames, resolve, alreadyNames) => {
     // 通知，以返回结果确定是否需要修改
     let achieve = await mutualManage(listNames, deposit, alreadyNames)
+
 
     // 如果不是半完成则通知修改
     if (achieve.ret !== NOFINISHED) {
@@ -183,7 +193,6 @@ export default (deposit) => {
         achieve.ret === SUCCESS
       )
     } else {
-      // console.log('----')
       // 记录已经检测过的
       let nalreadyNames = alreadyNames.concat(achieve.already)
       
@@ -191,7 +200,6 @@ export default (deposit) => {
       let fns = keyFns[ckey]
 
       // 通知不允许修改的key 
-        console.log(ckey)
       if (fns) {
         delete keyFns[ckey]
         while (fns.length) fns.shift()(false)
@@ -210,9 +218,10 @@ export default (deposit) => {
         } else {
           resolve(false)
 
-          let fnArr = keyFns[keys[0]]
+          key = keys[0]
+          let fnArr = keyFns[key]
           resolve = fnArr.shift()
-          fnArr.length === 0 && delete keyFns[keys[0]]
+          fnArr.length === 0 && delete keyFns[key]
         }
       }
 
@@ -221,18 +230,38 @@ export default (deposit) => {
     }
   }
 
-  return (listNames, key, value) => {
+  const grentRet = (listNames, key, value) => {
     deposit[key] = value
+
     if (!runStatus) {
       // 开始缓冲
       runStatus = 1
-      return new Promise(resolve => setTimeout(() => handle(key, listNames, resolve, [])))
+      return new Promise(resolve => 
+        setTimeout(() => {
+          // 开始检测，检测时不允许其他状态进入
+          checkStatus = 1
+          handle(key, listNames, resolve, [])
+        })
+      )
     } else {
       return new Promise(resolve => {
         // 缓冲时入栈
         if (!keyFns[key]) keyFns[key] = []
-        keyFns[key].push(resolve)
+        keyFns[key].push(r => resolve(r))
       })
+    }
+  }
+
+  return (listNames, key, value) => {
+    // 如果是有其他属性正在检测中则等待检测
+    if (checkStatus) {
+      return new Promise(resolve => {
+        readyFns.push(() => {
+          grentRet(listNames, key, value).then(r => resolve(r))
+        })
+      })
+    } else {
+      return grentRet(listNames, key, value)
     }
   }
 };
