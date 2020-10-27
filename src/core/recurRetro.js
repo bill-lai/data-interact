@@ -4,16 +4,12 @@ import { isDOM } from '../util'
 
 const getName = (prefix, key) => prefix + SPLICE + key
 
-let count = 10
 
 // 所有对象转成代理
 const recurRetro = (prefix, base, events, key, loaded = [base]) => {
   // 如果是dom则不监听
   if (isDOM(base)) {
     return base;
-  }
-  if (--count === 0) {
-    throw '终端'
   }
 
   const name = key ? getName(prefix, key) : prefix
