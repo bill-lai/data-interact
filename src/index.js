@@ -8,7 +8,7 @@ const responsive = (base) => {
   if (isDOM(base)) return base;
   
   const space = generateUUID()
-  const data = recurRetro(space, base)
+  const data = recurRetro(space, base, [])
   const api = grentApi(space, data)
 
 

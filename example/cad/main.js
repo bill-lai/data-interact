@@ -170,7 +170,10 @@ function bindMouseOper({points, lines}) {
 function bindUpdate({points, lines}) {
   points.forEach(point => {
     // 检测值是否能修改
-    point.api.listen('x', x => x > -critical[0] && x < critical[1])
+    point.api.listen('x', x => {
+      console.log('point.x')
+      return x > -critical[0] && x < critical[1]
+    })
     point.api.listen('y', y => y > -critical[0] && y < critical[1])
 
     // 响应数值变化
@@ -183,7 +186,10 @@ function bindUpdate({points, lines}) {
 
   lines.forEach(line => {
     // 检测值是否能修改
-    line.api.listen('points', () => !lines.some(cline => cline !== line && util.isLineIntersect(line, cline)))
+    line.api.listen('points', () => {
+      console.log('line.points')
+      return !lines.some(cline => cline !== line && util.isLineIntersect(line, cline))
+    })
 
     // 响应当点数值变化
     line.api.update('points', () => {
@@ -199,8 +205,9 @@ function bindUpdate({points, lines}) {
 }
 
 
-bindUpdate(
+let data = bindUpdate(
   bindMouseOper(
     domBind(analysis(datas))
   )
 )
+

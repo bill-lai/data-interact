@@ -13,10 +13,11 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
     set(target, key, value) {
       const listNames = namesManage.get(proxy)
 
-      if (value === target[key]) return;
-      if (!listNames || listNames.length === 0 || isDOM(value)) 
-        return target[key] = value
-
+      if (value === target[key]) return Reflect.set(...arguments);
+      if (!listNames || listNames.length === 0 || isDOM(value)) {
+        target[key] = value
+        return Reflect.set(...arguments);
+      }
 
       mutualHandle(listNames, key, value)
         .then(ret => {
@@ -79,10 +80,7 @@ const unListenItem = (target, key, currentListName) => {
 
 // 是否创建控制函数
 const _listenItem = (listNames, currentListName, obj) => {
-  // 暂存要修改的属性
-  const deposit = {}
   let proxy = obj
-
 
   // 标识直接监听者
   listNames = listNames.map((name, i) => ({start: i === listNames.length - 1, name}))
@@ -91,6 +89,8 @@ const _listenItem = (listNames, currentListName, obj) => {
   if (namesManage.has(obj)) {
     namesManage.set(obj, [...listNames, ...namesManage.get(obj)])
   } else {
+    // 暂存要修改的属性
+    const deposit = {}
     const parentValue = getNameJoinEvents(currentListName)
 
     // 如果是正在使用的对象重新赋值，则查看有多少个关联依次添加关联
