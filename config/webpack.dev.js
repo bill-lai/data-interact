@@ -5,9 +5,11 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const webpack = require('webpack');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    main: './example/cad/js/main.js'
+  },
   output: {
-    filename: './example/data-interact.js',
+    filename: '[name].js',
     path: resolve('dist')
   },
   module: {
@@ -32,6 +34,9 @@ module.exports = {
     ]
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: './example/cad/index.html'
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {

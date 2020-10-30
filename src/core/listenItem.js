@@ -35,6 +35,8 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
             target[key] = value
           }
         })
+
+      return true
     },
     get(target, key) {
       // 优先获取缓存中的数据

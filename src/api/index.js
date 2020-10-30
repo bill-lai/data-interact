@@ -9,9 +9,9 @@ const handle = (api, space, last, ...args) =>
 
 const openApi = (space, data) => {
   const api = {
-    listen: (...args) => handle('listen', space, '', ...args),
-    remove: (...args) => handle('remove', space, '', ...args),
-    once: (...args) => handle('once', space, '', ...args),
+    stop: (...args) => handle('listen', space, '', ...args),
+    removeStop: (...args) => handle('remove', space, '', ...args),
+    onceStop: (...args) => handle('once', space, '', ...args),
     update: (...args) => handle('listen', space, UPDATE, ...args),
     onceUpdate: (...args) => handle('once', space, UPDATE, ...args),
     removeUpdate: (...args) => handle('remove', space, UPDATE, ...args),

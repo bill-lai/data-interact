@@ -22,6 +22,5 @@ const responsive = (base) => {
   })
 }
 
-global.responsive = responsive
 
 export default responsive

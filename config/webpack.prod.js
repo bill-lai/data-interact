@@ -2,10 +2,12 @@ const { resolve } = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/export.js',
   output: {
     filename: './data-interact.js',
-    path: resolve('dist')
+    path: resolve('dist'),
+    library: 'responsive',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

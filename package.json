@@ -12,6 +12,7 @@
     "src/",
     "types.d.ts"
   ],
+  "types": "types.d.ts",
   "repository": {
     "type": "git",
     "url": "854556519@qq.com"
