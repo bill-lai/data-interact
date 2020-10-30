@@ -19,7 +19,7 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
         return Reflect.set(...arguments);
       }
 
-      mutualHandle(listNames, key, value)
+      mutualHandle(listNames, key, value, target)
         .then(ret => {
           if (!ret) return;
 
@@ -119,7 +119,7 @@ const _listenItem = (listNames, currentListName, obj) => {
       deposit,
       currentListName,
       obj,
-      eventManage(deposit)
+      eventManage(deposit, obj)
     )
 
     namesManage.set(proxy, listNames)

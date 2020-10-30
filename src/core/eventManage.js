@@ -12,17 +12,21 @@ const getLastName = name => name.substr(name.lastIndexOf(SPLICE) + SPLICE.length
 
 
 // 组合事件与key需要监听的事件，并合并所需事件，并组合参数
-const combination = (names, deposit) => {
+const combination = (names, deposit, target) => {
   let rets = []
 
   names.forEach(name => {
     Object.keys(deposit).forEach(key => {
-      rets.push({name: name + SPLICE + key, args: deposit[key], type: KEYEVENT})
+      rets.push({
+        name: name + SPLICE + key, 
+        args: target ? [deposit[key], target[key]] : [deposit[key]], 
+        type: KEYEVENT
+      })
     })
   })
 
   names.forEach(name => {
-    rets.push({name, args: deposit, type: OBJEVENT})
+    rets.push({name, args: target ? [deposit] : [deposit, target], type: OBJEVENT})
   })
 
   return rets
@@ -33,7 +37,9 @@ const mutualManage = (() => {
   const fns = {}
 
   // 父级多次合并发送
-  const mutualParent = (name, originNames, deposit) => {
+  const mutualParent = (name, originNames, deposit, target) => {
+    
+    console.log(originNames, name)
     const originName = originNames.find(originName => ~originName.indexOf(name))
     let keys
     try {
@@ -46,30 +52,37 @@ const mutualManage = (() => {
 
     // 如果需要通知多个参数，则合并参数
     const args = fns[name] ? fns[name]._cache : {}
+    const oldArgs = fns[name] ? fns[name]._old_cache : {}
 
     let fixed = args
+    let oldFixed = oldArgs
 
     while (keys.length) {
       let key = keys.shift()
       fixed[key] = fixed[key] || {}
+      oldFixed[key] = oldFixed[key] || {}
       fixed = fixed[key]
+      oldFixed = oldFixed[key]
     }
 
     for (let key in deposit) {
       fixed[key] = deposit[key]
+      oldFixed[key] = target[key]
     }
 
     if (!fns[name]) {
       fns[name] = []
       fns[name]._cache = args
+      fns[name]._old_cache = oldArgs
 
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          let ret = ResponsiveEvent.mutual(name, fns[name]._cache)
+          console.log('emit', name)
+          let ret = ResponsiveEvent.mutual(name, fns[name]._cache, fns[name]._old_cache)
           fns[name].forEach(fn => fn(ret))
           delete fns[name]
           ret ? resolve() : reject()
-        })
+        }, 100)
       })
     } else {
       // 同个事件一次发送
@@ -77,17 +90,17 @@ const mutualManage = (() => {
     }
   }
 
-  return async (names, deposit, alreadyNames) => {
+  return async (names, deposit, target, alreadyNames) => {
     let originNames = names.filter(({start}) => start).map(({name}) => name)
     names = names.filter(({start}) => !start).map(({name}) => name)
     
 
     // 如果是直接监听者则直接发送，并发送子项
-    let emitArgs = combination(originNames, deposit)
+    let emitArgs = combination(originNames, deposit, target)
 
     for (let i = 0; i < emitArgs.length; i++) {
       if (!~alreadyNames.indexOf(emitArgs[i].name)) {
-        let ret = ResponsiveEvent.mutual(emitArgs[i].name, emitArgs[i].args)
+        let ret = ResponsiveEvent.mutual(emitArgs[i].name, ...emitArgs[i].args)
 
         if (!ret) {
           // 如果只是单个属性没完成，则结果为半完成，记录下来，继续其他属性
@@ -112,7 +125,7 @@ const mutualManage = (() => {
     let promises = []
     // 如果是父级则合并发送
     for (let i = names.length - 1; i >= 0; i--) {
-      promises.push(mutualParent(names[i], originNames, deposit))
+      promises.push(mutualParent(names[i], originNames, deposit, target))
     }
 
     try {
@@ -140,7 +153,7 @@ const updateHandle = (() => {
 
 
 // 创建发布订阅与决定是否修改函数
-export default (deposit) => {
+export default (deposit, target) => {
   // 记录是否正在缓冲中
   let runStatus = 0
   // 缓冲时入栈
@@ -152,6 +165,7 @@ export default (deposit) => {
 
 
   const resulut = (key, resolve, listNames, success) => {
+    
     resolve(success)
 
     // 销栈，依次通知
@@ -164,7 +178,6 @@ export default (deposit) => {
       delete keyFns[key]
     }
 
-    deposit.x > 300 && console.log(deposit.x)
     // 如果确定修改则通知修改
     success && updateHandle(listNames, deposit)
 
@@ -181,7 +194,7 @@ export default (deposit) => {
 
   const handle = async (key, listNames, resolve, alreadyNames) => {
     // 通知，以返回结果确定是否需要修改
-    let achieve = await mutualManage(listNames, deposit, alreadyNames)
+    let achieve = await mutualManage(listNames, deposit, target, alreadyNames)
 
 
     // 如果不是半完成则通知修改
@@ -230,7 +243,7 @@ export default (deposit) => {
     }
   }
 
-  const grentRet = (listNames, key, value) => {
+  const grentRet = (listNames, key, value, target) => {
     deposit[key] = value
 
     if (!runStatus) {
@@ -252,7 +265,7 @@ export default (deposit) => {
     }
   }
 
-  return (listNames, key, value) => {
+  return (listNames, key, value, target) => {
     // 如果是有其他属性正在检测中则等待检测
     if (checkStatus) {
       return new Promise(resolve => {
