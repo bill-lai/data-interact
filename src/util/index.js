@@ -47,3 +47,6 @@ export const getNameJoinEvents = (currentListName) => {
 export const isDOM = typeof HTMLElement === 'object' ? 
   obj => obj instanceof HTMLElement :
   obj => obj && typeof obj === 'object' && obj.nodeType === 1 && typeof obj.nodeName === 'string'
+
+
+export const isRetofitting = obj => obj instanceof Object && !isDOM(obj)

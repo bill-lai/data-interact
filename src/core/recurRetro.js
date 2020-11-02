@@ -1,6 +1,6 @@
 import listenItem from './listenItem'
-import { SPLICE, namesManage } from '../global'
-import { isDOM } from '../util'
+import { SPLICE } from '../global'
+import { isRetofitting } from '../util'
 
 const getName = (prefix, key) => prefix + SPLICE + key
 
@@ -8,7 +8,7 @@ const getName = (prefix, key) => prefix + SPLICE + key
 // 所有对象转成代理
 const recurRetro = (prefix, base, events, key, loaded = [base]) => {
   // 如果是dom则不监听
-  if (isDOM(base)) {
+  if (!isRetofitting(base)) {
     return base;
   }
 
@@ -17,8 +17,7 @@ const recurRetro = (prefix, base, events, key, loaded = [base]) => {
 
   // namesManage.has(base[key])
   for (let key in base) {
-    if (base[key] instanceof Object && !~loaded.indexOf(base[key])) {
-
+    if (isRetofitting(base[key]) && !~loaded.indexOf(base[key])) {
       // 防止循环引用
       loaded.push(base[key])
       // 封装成代理

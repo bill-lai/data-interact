@@ -1,4 +1,4 @@
-import { namesManage, SPLICE } from '../global'
+import { namesManage, SPLICE, OLDIDENT } from '../global'
 import { getNameJoinEvents, isDOM } from '../util'
 import eventManage from './eventManage'
 import recurRetro from './recurRetro'
@@ -14,10 +14,10 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
       const listNames = namesManage.get(proxy)
 
       if (value === target[key]) return Reflect.set(...arguments);
-      if (!listNames || listNames.length === 0 || isDOM(value)) {
-        target[key] = value
-        return Reflect.set(...arguments);
-      }
+      // if (!listNames || listNames.length === 0 || isDOM(value)) {
+      //   target[key] = value
+      //   return Reflect.set(...arguments);
+      // }
 
       mutualHandle(listNames, key, value, target)
         .then(ret => {
@@ -39,8 +39,12 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
       return true
     },
     get(target, key) {
-      // 优先获取缓存中的数据
-      return key in deposit ? deposit[key] : target[key]
+      if (key.indexOf(OLDIDENT) === 0) {
+        return target[key.substr(OLDIDENT.length)]
+      } else {
+        // 优先获取缓存中的数据
+        return key in deposit ? deposit[key] : target[key]
+      }
     }
   })
 

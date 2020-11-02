@@ -51,7 +51,9 @@ interface API<T> {
   removeUpdate<T>(eventName: string, callback: MutualFn<T>): void;
 
   // Get the original proxy without attached API
-  origin: T
+  origin: T,
+  // Get the data before modification, which cannot be modified
+  old: T
 }
 
 

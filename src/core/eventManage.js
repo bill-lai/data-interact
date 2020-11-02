@@ -96,7 +96,7 @@ const mutualManage = (() => {
     }
   }
 
-  return async (names, deposit, target, alreadyNames) => {
+  return async (names, deposit, target, alreadys) => {
     let originNames = names.filter(({start}) => start).map(({name}) => name)
     names = names.filter(({start}) => !start).map(({name}) => name)
     
@@ -105,20 +105,20 @@ const mutualManage = (() => {
     let emitArgs = combination(originNames, deposit, target)
 
     for (let i = 0; i < emitArgs.length; i++) {
-      if (!~alreadyNames.indexOf(emitArgs[i].name)) {
+      
+      if (!alreadys.some(({name}) => name === emitArgs[i].name)) {
         let ret = ResponsiveEvent.mutual(emitArgs[i].name, ...emitArgs[i].args)
-
         if (!ret) {
           // 如果只是单个属性没完成，则结果为半完成，记录下来，继续其他属性
           if (emitArgs[i].type === OBJEVENT || emitArgs.length === i + 1) {
             return { ret: ERROR };
           } else if (emitArgs[i].type === KEYEVENT) {
             let attr = getLastName(emitArgs[i].name)
-            let already = emitArgs.splice(0, i + 1).map(({name}) => name)
+            let already = emitArgs.splice(0, i + 1).map(({name}, index) => ({name, adopt: index !== i}))
 
             emitArgs.forEach(item => {
               if (getLastName(item.name) === attr) {
-                already.push(item.name)
+                already.push({name: item.name, adopt: false})
               }
             })
 
@@ -198,9 +198,9 @@ export default (deposit, target) => {
     while (readyFns.length) readyFns.shift()();
   }
 
-  const handle = async (key, listNames, resolve, alreadyNames) => {
+  const handle = async (key, listNames, resolve, alreadys) => {
     // 通知，以返回结果确定是否需要修改
-    let achieve = await mutualManage(listNames, deposit, target, alreadyNames)
+    let achieve = await mutualManage(listNames, deposit, target, alreadys)
 
 
     // 如果不是半完成则通知修改
@@ -213,9 +213,9 @@ export default (deposit, target) => {
       )
     } else {
       // 记录已经检测过的
-      let nalreadyNames = alreadyNames.concat(achieve.already)
+      let nalreadys = alreadys.concat(achieve.already)
       
-      let ckey = getLastName(nalreadyNames.pop())
+      let ckey = getLastName(nalreadys.pop().name)
       let fns = keyFns[ckey]
 
       // 通知不允许修改的key 
@@ -245,7 +245,7 @@ export default (deposit, target) => {
       }
 
       // 继续通知
-      handle(key, listNames, resolve, nalreadyNames)
+      handle(key, listNames, resolve, nalreadys)
     }
   }
 

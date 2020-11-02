@@ -73,6 +73,25 @@ points.forEach(point => {
     $mouseCt.addEventListener('mouseup', upHandle)
   })
 
+  // $point.addEventListener('mousedown', ev => {
+  //   let start = { x: ev.offsetX, y: ev.offsetY }
+
+  //   function moveHandle(ev) {
+  //     let end = {x: ev.offsetX, y: ev.offsetY}
+  //     point.x += end.x - start.x
+  //     point.y += end.y - start.y
+  //     start = end
+  //   }
+
+  //   function upHandle() {
+  //     $mouseCt.removeEventListener('mousemove', moveHandle)
+  //     $mouseCt.removeEventListener('mouseup', upHandle)
+  //   }
+
+  //   $mouseCt.addEventListener('mousemove', moveHandle)
+  //   $mouseCt.addEventListener('mouseup', upHandle)
+  // })
+
   point.dom = $point
   $container.appendChild($point)
 })
