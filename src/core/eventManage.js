@@ -13,6 +13,7 @@ const getLastName = name => name.substr(name.lastIndexOf(SPLICE) + SPLICE.length
 
 // 组合事件与key需要监听的事件，并合并所需事件，并组合参数
 const combination = (names, deposit, target) => {
+
   let rets = []
 
   names.forEach(name => {
@@ -26,7 +27,13 @@ const combination = (names, deposit, target) => {
   })
 
   names.forEach(name => {
-    rets.push({name, args: target ? [deposit] : [deposit, target], type: OBJEVENT})
+    let args = [{...deposit}]
+    if (target) {
+      let tar = {}
+      for (let key in deposit) tar[key] = target[key]
+      args.push(tar)
+    }
+    rets.push({name, args: args, type: OBJEVENT})
   })
 
   return rets
@@ -39,7 +46,6 @@ const mutualManage = (() => {
   // 父级多次合并发送
   const mutualParent = (name, originNames, deposit, target) => {
     
-    console.log(originNames, name)
     const originName = originNames.find(originName => ~originName.indexOf(name))
     let keys
     try {
@@ -75,14 +81,14 @@ const mutualManage = (() => {
       fns[name]._cache = args
       fns[name]._old_cache = oldArgs
 
+
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          console.log('emit', name)
           let ret = ResponsiveEvent.mutual(name, fns[name]._cache, fns[name]._old_cache)
           fns[name].forEach(fn => fn(ret))
           delete fns[name]
           ret ? resolve() : reject()
-        }, 100)
+        })
       })
     } else {
       // 同个事件一次发送
@@ -143,7 +149,7 @@ const mutualManage = (() => {
 const updateHandle = (() => {
 
   return (names, deposit) => {
-    names = combination(names.map(({name}) => name), deposit)
+    names = combination(names.map(({name}) => name), deposit, false)
     names.forEach(({name}) => {
       ResponsiveEvent.trigger(`${name}${UPDATE}`)
     })

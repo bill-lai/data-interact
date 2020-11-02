@@ -18,8 +18,9 @@ const data = {
 }
 
 const points = data.points.map(point => responsive(point))
-const lines = data.lines.map(line => {
+const lines = data.lines.map((line, i) => {
   return responsive({
+    id: i,
     points: [
       points.find((point) => point.id === line[0]).api.origin,
       points.find((point) => point.id === line[1]).api.origin

@@ -23,8 +23,6 @@ points.forEach(point => {
 lines.forEach(line => {
   // 检测值是否能修改
   line.api.stop('points', (newPs, oldPs) => {
-    console.log(newPs, oldPs)
-
     return !lines.some(cline => cline !== line && util.isLineIntersect(line, cline))
   })
 
