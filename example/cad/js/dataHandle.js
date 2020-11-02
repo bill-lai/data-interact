@@ -26,6 +26,11 @@ lines.forEach(line => {
   //   return !lines.some(cline => cline !== line && util.isLineIntersect(line, cline))
   // })
 
+  let oPoints = [
+    line.api.old.points[0],
+    line.api.old.points[1]
+  ]
+
   const check = (oldPoint, newPoint) => {
     let clines = lines.map(line => {
       let index = line.points.indexOf(oldPoint)
@@ -50,28 +55,25 @@ lines.forEach(line => {
 
   
   line.api.stop('points.0.x', (newPs, oldPs) => 
-    check(line.points[0], {y: line.api.old.points[0].y, x: newPs}, 'points.0.x')
+    check(line.points[0], {y: oPoints[0].y, x: newPs}, 'points.0.x')
   )
 
   
   line.api.stop('points.0.y', (newPs, oldPs) => 
-    check(line.points[0], {x: line.api.old.points[0].x, y: newPs}, 'points.0.y')
+    check(line.points[0], {x: oPoints[0].x, y: newPs}, 'points.0.y')
   )
 
   
   line.api.stop('points.1.x', (newPs, oldPs) => 
-    check(line.points[1], {y: line.api.old.points[1].y, x: newPs}, 'points.1.x')
+    check(line.points[1], {y: oPoints[1].y, x: newPs}, 'points.1.x')
   )
 
   
   line.api.stop('points.1.y', (newPs, oldPs) => 
-    check(line.points[1], {x: line.api.old.points[1].x, y: newPs}, 'points.1.y')
+    check(line.points[1], {x: oPoints[1].x, y: newPs}, 'points.1.y')
   )
 
   // 响应当点数值变化
   line.api.update('points', () => line.dom.setAttribute('d', ` M ${line.points[0].x} ${line.points[0].y}  L ${line.points[1].x} ${line.points[1].y}`))
 })
 
-
-
-global.lines = lines
