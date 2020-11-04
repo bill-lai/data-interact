@@ -29,6 +29,9 @@ const openApi = (space, data) => {
     update: (...args) => handle('listen', space, UPDATE, ...args),
     onceUpdate: (...args) => handle('once', space, UPDATE, ...args),
     removeUpdate: (...args) => handle('remove', space, UPDATE, ...args),
+    destroy: () => {
+      
+    },
     origin: data,
     old: getDataOld(data)
   }

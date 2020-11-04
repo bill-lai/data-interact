@@ -53,7 +53,9 @@ interface API<T> {
   // Get the original proxy without attached API
   origin: T,
   // Get the data before modification, which cannot be modified
-  old: T
+  old: T,
+  
+  destroy(): void;
 }
 
 

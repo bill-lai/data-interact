@@ -53,7 +53,8 @@ module.exports = {
     contentBase: './dist',  //项目根路径
     watchContentBase: true,
     hot: true,  //开启热模替换功能
-    open: true  //自动打开浏览器
+    open: true,  //自动打开浏览器
+    port: 8001
   },
   mode: 'development'
 }
