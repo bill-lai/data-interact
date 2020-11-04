@@ -18,6 +18,7 @@ const data = {
 }
 
 const points = data.points.map(point => responsive(point))
+global.points = points
 const lines = data.lines.map((line, i) => {
   return responsive({
     id: i,
@@ -28,5 +29,10 @@ const lines = data.lines.map((line, i) => {
   })
 })
 
+let test = responsive({
+  points: lines[0].points
+})
 
+global.lines = lines
+global.test = test
 export { lines, points }

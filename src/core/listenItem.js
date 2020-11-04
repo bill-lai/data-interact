@@ -1,15 +1,15 @@
-import { namesManage, SPLICE, OLDIDENT } from '../global'
-import { getNameJoinEvents, isDOM } from '../util'
+import { namesManage, SPLICE, OLDIDENT, proxyManage } from '../global'
+import { getNameJoinEvents } from '../util'
 import eventManage from './eventManage'
 import recurRetro from './recurRetro'
 
 
 
 // 单独封装每一项
-const listenItem = (deposit, currentListName, obj, mutualHandle) => {
+const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
 
   // 转成代理对象
-  const proxy = new Proxy(obj, {
+  const { proxy, revoke } = Proxy.revocable(obj, {
     set(target, key, value) {
       const listNames = namesManage.get(proxy)
 
@@ -25,7 +25,7 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
 
           // 如果卸下原来的代理
           if (namesManage.has(target[key])) {
-            unListenItem(target[key], key, currentListName)
+            unListenItem(target[key], currentListName, key)
           }
           
           // 如果时重新赋予的对象则再度封装
@@ -48,17 +48,19 @@ const listenItem = (deposit, currentListName, obj, mutualHandle) => {
     }
   })
 
+  proxyManage.set(proxy, revoke)
+
   return proxy
 }
 
 
 
 // 解绑代理
-const unListenItem = (target, key, currentListName) => {
-  currentListName = currentListName + SPLICE + key
+export const unListenItem = (target, prefixName, key) => {
+  let currentListName = key ? prefixName + SPLICE + key : prefixName
 
   // 当前代理往后所有要删除的
-  const delkey = currentListName.substr(0, currentListName.indexOf(SPLICE))
+  const delkey = prefixName
   // 要处理的代理
   const proxys = []
 
@@ -75,6 +77,8 @@ const unListenItem = (target, key, currentListName) => {
 
     if (names.length === 0) {
       namesManage.delete(proxy)
+      proxyManage.get(proxy)()
+      proxyManage.delete(proxy)
     } else {
       namesManage.set(proxy, names)
     }
@@ -85,7 +89,7 @@ const unListenItem = (target, key, currentListName) => {
 
 
 // 是否创建控制函数
-const _listenItem = (listNames, currentListName, obj) => {
+export const listenItem = (listNames, currentListName, obj) => {
   let proxy = obj
 
   // 标识直接监听者
@@ -119,7 +123,7 @@ const _listenItem = (listNames, currentListName, obj) => {
     }
 
     // 生成代理
-    proxy = listenItem(
+    proxy = _listenItem(
       deposit,
       currentListName,
       obj,
@@ -131,5 +135,3 @@ const _listenItem = (listNames, currentListName, obj) => {
 
   return proxy
 }
-
-export default _listenItem

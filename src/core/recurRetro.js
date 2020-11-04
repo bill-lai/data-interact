@@ -1,4 +1,4 @@
-import listenItem from './listenItem'
+import { listenItem } from './listenItem'
 import { SPLICE } from '../global'
 import { isRetofitting } from '../util'
 
