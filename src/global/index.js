@@ -14,5 +14,3 @@ export const proxyManage = new Map()
 export const UPDATE = 'Update'
 // 获取修改前的对象
 export const OLDIDENT = '__OLD_IDENT__'
-
-global.namesManage = namesManage
