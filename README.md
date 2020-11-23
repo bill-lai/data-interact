@@ -1,12 +1,12 @@
 # data-interact
 深度监听数据，并且可以拦截对数据的修改，以事件监听，代理为核心驱动
 
-###安装
+### 安装
 ```javascript
 npm install data-interact
 ```
 
-###使用
+### 使用
 ```
 import responsive from 'data-interact'
 
@@ -51,7 +51,7 @@ line1.points = [
 line1.points[0].x = 9
 ```
 
-###API
+### API
 |  方法   | 说明  | 回调参数 | 回调应返回 |
 |  ----  | ----  | ---- |  ---- |
 | stop([local], calaabck)  | 拦截指定参数修改 <br> local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 | false \| any |
@@ -60,7 +60,9 @@ line1.points[0].x = 9
 | update([local], calaabck)  | 监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
 | removeUpdate([local], calaabck)  | 移除监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 |  
 | onceUpdate([local], calaabck)  | 监听一次对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
-###Attr
+
+
+### Attr
 |  属性   | 说明  | 
 |  ----  | ----  |
 | origin | 没有被代理前的对象 |
