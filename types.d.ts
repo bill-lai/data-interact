@@ -1,7 +1,7 @@
 
 interface MutualFn<T> { (args: T): boolean }
 
-interface API<T> {
+export interface API<T> {
   /**
    * Intercept property change callback，Return false to prevent modification 
    * @param {string?} eventName 
@@ -58,9 +58,5 @@ interface API<T> {
   destroy(): void;
 }
 
-
-declare function exports<T = {}>(
-	options: T
-): T & { api: API<T> };
-
-export default exports
+export type Interact<T> = T &  { api: API<T> };
+export default function exports<T = {}>( options: T ): Interact<T>;
