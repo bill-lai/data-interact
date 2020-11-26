@@ -1,6 +1,6 @@
 {
   "name": "data-interact",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Listen to reference data and intercept it asynchronously when modifying data",
   "main": "src/export.js",
   "scripts": {
@@ -10,12 +10,15 @@
   },
   "files": [
     "src/",
+    "config/",
+    "example/",
     "types.d.ts"
   ],
   "types": "types.d.ts",
+  "homepage": "https://github.com/bill-lai/data-interact",
   "repository": {
     "type": "git",
-    "url": "854556519@qq.com"
+    "url": "git+https://github.com/bill-lai/data-interact.git"
   },
   "keywords": [
     "listener",
