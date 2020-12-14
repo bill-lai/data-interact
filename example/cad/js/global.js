@@ -28,9 +28,11 @@ const lines = data.lines.map((line, i) => {
   })
 })
 
-
-points[0].api.nextTick(() => {
-  console.log('-----------')
+points[0].x = 100
+lines[0].api.nextTick('points.0.x', (...args) => {
+  console.log('---------', points[0].x)
 })
+lines[0].points[0].x = 200
+
 
 export { lines, points }

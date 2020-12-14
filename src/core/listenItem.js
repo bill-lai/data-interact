@@ -1,7 +1,8 @@
-import { namesManage, SPLICE, OLDIDENT, proxyManage } from '../global'
-import { getNameJoinEvents } from '../util'
+import { namesManage, SPLICE, OLDIDENT, proxyManage, updateIngs, ResponsiveEvent, UPDATEING } from '../global'
+import { getNameJoinEvents, isDOM } from '../util'
 import eventManage from './eventManage'
 import recurRetro from './recurRetro'
+
 
 
 
@@ -14,25 +15,47 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
       const listNames = namesManage.get(proxy)
 
       if (value === target[key]) return Reflect.set(...arguments);
-      // if (!listNames || listNames.length === 0 || isDOM(value)) {
-      //   target[key] = value
-      //   return Reflect.set(...arguments);
-      // }
+      if (!listNames || listNames.length === 0 || isDOM(value)) {
+        target[key] = value
+        return Reflect.set(...arguments);
+      }
 
+      // 记录正在修改的状态
+      let vals = updateIngs.get(proxy)
+      if (vals) {
+        vals.push(key)
+      } else {
+        vals = [key]
+        updateIngs.set(proxy, vals)
+      }
+      
       mutualHandle(listNames, key, value, target)
         .then(ret => {
-          if (!ret) return;
-
-          // 如果卸下原来的代理
-          if (namesManage.has(target[key])) {
-            unListenItem(target[key], currentListName, key)
+          if (ret) {
+            // 如果卸下原来的代理
+            if (namesManage.has(target[key])) {
+              unListenItem(target[key], currentListName, key)
+            }
+            
+            // 如果时重新赋予的对象则再度封装
+            if (value instanceof Object) {
+              target[key] = recurRetro(currentListName, value, listNames.map(({name}) => name), key)
+            } else {
+              target[key] = value
+            }
           }
           
-          // 如果时重新赋予的对象则再度封装
-          if (value instanceof Object) {
-            target[key] = recurRetro(currentListName, value, listNames.map(({name}) => name), key)
-          } else {
-            target[key] = value
+          let index = vals.indexOf(key)
+          ~index && vals.splice(index, 1)
+
+          // 如果已经完成了所有修改则通知
+          if (!~vals.indexOf(key)) {
+            let names = listNames.map(({name}) => name)
+            names = names.concat(names.map(name => `${name}${SPLICE}${key}`))
+
+            names.forEach((name) => {
+              ResponsiveEvent.trigger(`${name}${UPDATEING}`)
+            })
           }
         })
 
@@ -79,6 +102,7 @@ export const unListenItem = (target, prefixName, key) => {
       namesManage.delete(proxy)
       proxyManage.get(proxy)()
       proxyManage.delete(proxy)
+      updateIngs.delete(proxy)
     } else {
       namesManage.set(proxy, names)
     }

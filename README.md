@@ -60,6 +60,7 @@ line1.points[0].x = 9
 | update([local], calaabck)  | 监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
 | removeUpdate([local], calaabck)  | 移除监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 |  
 | onceUpdate([local], calaabck)  | 监听一次对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
+| nextTick([local], calaabck)  | 当数据下次变化时，注意只有当属性不再修改队列中或没有修改才会触发回调 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | void |
 
 
 ### Attr
