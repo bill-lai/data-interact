@@ -10,7 +10,6 @@ const NOFINISHED = 3
 const getLastName = name => name.substr(name.lastIndexOf(SPLICE) + SPLICE.length)
 
 
-
 // 组合事件与key需要监听的事件，并合并所需事件，并组合参数
 const combination = (names, deposit, target) => {
 

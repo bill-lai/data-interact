@@ -18,8 +18,11 @@ const getDataOld = (data) =>
     set(target, key) {
       return false
     }
-  })
+  });
 
+const nextTick = (space, data, args) => {
+  console.log(space, data, args)
+}
 
 const openApi = (space, data) => {
   const api = {
@@ -29,6 +32,7 @@ const openApi = (space, data) => {
     update: (...args) => handle('listen', space, UPDATE, ...args),
     onceUpdate: (...args) => handle('once', space, UPDATE, ...args),
     removeUpdate: (...args) => handle('remove', space, UPDATE, ...args),
+    nextTick: (...args) => nextTick(space, data, args),
     origin: data,
     old: getDataOld(data)
   }

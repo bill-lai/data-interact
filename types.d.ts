@@ -50,6 +50,15 @@ export interface API<T> {
   removeUpdate<T>(callback: MutualFn<T>): void;
   removeUpdate<T>(eventName: string, callback: MutualFn<T>): void;
 
+  
+  /**
+   * remove Triggered when the property change is successful
+   * @param {string?} eventName 
+   * @param {function} callback 
+   */
+  nextTick<T>(callback: MutualFn<T>): void;
+  nextTick<T>(eventName: string, callback: MutualFn<T?>): void;
+
   // Get the original proxy without attached API
   origin: T,
   // Get the data before modification, which cannot be modified
