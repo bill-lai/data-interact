@@ -1,5 +1,6 @@
 
 interface MutualFn<T> { (args: T): boolean }
+interface UpdateFn { (): void }
 
 export interface API<T> {
   /**
@@ -31,24 +32,24 @@ export interface API<T> {
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  update<T>(callback: MutualFn<T>): void;
-  update<T>(eventName: string, callback: MutualFn<T>): void;
+  update<T>(callback: UpdateFn<T>): void;
+  update<T>(eventName: string, callback: UpdateFn<T>): void;
 
   /**
    * One time Triggered when the property change is successful
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  onceUpdate<T>(callback: MutualFn<T>): void;
-  onceUpdate<T>(eventName: string, callback: MutualFn<T>): void;
+  onceUpdate<T>(callback: UpdateFn<T>): void;
+  onceUpdate<T>(eventName: string, callback: UpdateFn<T>): void;
   
   /**
    * remove Triggered when the property change is successful
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  removeUpdate<T>(callback: MutualFn<T>): void;
-  removeUpdate<T>(eventName: string, callback: MutualFn<T>): void;
+  removeUpdate<T>(callback: UpdateFn<T>): void;
+  removeUpdate<T>(eventName: string, callback: UpdateFn<T>): void;
 
   
   /**
@@ -56,8 +57,8 @@ export interface API<T> {
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  nextTick<T>(callback: MutualFn<T>): void;
-  nextTick<T>(eventName: string, callback: MutualFn<T?>): void;
+  nextTick<T>(callback: UpdateFn<T>): void;
+  nextTick<T>(eventName: string, callback: UpdateFn<T>): void;
 
   // Get the original proxy without attached API
   origin: T,
