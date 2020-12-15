@@ -32,24 +32,24 @@ export interface API<T> {
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  update<T>(callback: UpdateFn<T>): void;
-  update<T>(eventName: string, callback: UpdateFn<T>): void;
+  update(callback: UpdateFn): void;
+  update(eventName: string, callback: UpdateFn): void;
 
   /**
    * One time Triggered when the property change is successful
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  onceUpdate<T>(callback: UpdateFn<T>): void;
-  onceUpdate<T>(eventName: string, callback: UpdateFn<T>): void;
+  onceUpdate(callback: UpdateFn): void;
+  onceUpdate(eventName: string, callback: UpdateFn): void;
   
   /**
    * remove Triggered when the property change is successful
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  removeUpdate<T>(callback: UpdateFn<T>): void;
-  removeUpdate<T>(eventName: string, callback: UpdateFn<T>): void;
+  removeUpdate(callback: UpdateFn): void;
+  removeUpdate(eventName: string, callback: UpdateFn): void;
 
   
   /**
@@ -57,8 +57,8 @@ export interface API<T> {
    * @param {string?} eventName 
    * @param {function} callback 
    */
-  nextTick<T>(callback: UpdateFn<T>): void;
-  nextTick<T>(eventName: string, callback: UpdateFn<T>): void;
+  nextTick(callback: UpdateFn): void;
+  nextTick(eventName: string, callback: UpdateFn): void;
 
   // Get the original proxy without attached API
   origin: T,
