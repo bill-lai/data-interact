@@ -74,6 +74,12 @@ lines.forEach(line => {
   )
 
   // 响应当点数值变化
-  line.api.update('points', () => line.dom.setAttribute('d', ` M ${line.points[0].x} ${line.points[0].y}  L ${line.points[1].x} ${line.points[1].y}`))
+  line.api.update('points', () => {
+    // console.log(line.points[0].x, line.points[1].x)
+    line.dom.setAttribute('d', ` M ${line.points[0].x} ${line.points[0].y}  L ${line.points[1].x} ${line.points[1].y}`)
+  })
 })
 
+lines[0].api.update('points', () => {
+  console.log(lines[0].points[0].x, lines[0].points[1].x)
+})

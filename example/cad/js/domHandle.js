@@ -39,6 +39,8 @@ lines.map(line => {
 
   line.dom = $line
 
+  
+
   $container.appendChild($line)
 })
 

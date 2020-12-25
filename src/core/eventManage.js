@@ -186,8 +186,6 @@ export default (deposit, target) => {
     // 如果确定修改则通知修改
     success && updateHandle(listNames, deposit)
 
-    // 删除缓存
-    for (let key in deposit) delete deposit[key]
 
     // 结束缓冲
     runStatus = 0

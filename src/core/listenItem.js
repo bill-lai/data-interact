@@ -57,6 +57,9 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
               ResponsiveEvent.trigger(`${name}${UPDATEING}`)
             })
           }
+          
+          // 删除缓存
+          for (let key in deposit) delete deposit[key]
         })
 
       return true
