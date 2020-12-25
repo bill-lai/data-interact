@@ -1,4 +1,4 @@
-import { ResponsiveEvent, UPDATE, SPLICE, OLDIDENT, updateIngs, UPDATEING } from '../global'
+import { ResponsiveEvent, synchroProxy, UPDATE, SPLICE, OLDIDENT, updateIngs, UPDATEING } from '../global'
 import { isRetofitting } from '../util'
 
 const handle = (api, space, last, ...args) =>
@@ -45,6 +45,17 @@ const openApi = (space, data) => {
     }
   }
 
+  // 设置模式，有同步异步两种模式
+  const setPattern = (isAsync) => {
+    let index = synchroProxy.indexOf(data)
+
+    if (isAsync) {
+      ~index && synchroProxy.splice(index, 1)
+    } else {
+      ~index || synchroProxy.push(data)
+    }
+  }
+
   const api = {
     stop: (...args) => handle('listen', space, '', ...args),
     removeStop: (...args) => handle('remove', space, '', ...args),
@@ -53,6 +64,7 @@ const openApi = (space, data) => {
     onceUpdate: (...args) => handle('once', space, UPDATE, ...args),
     removeUpdate: (...args) => handle('remove', space, UPDATE, ...args),
     nextTick,
+    setPattern,
     origin: data,
     old: getDataOld(data)
   }

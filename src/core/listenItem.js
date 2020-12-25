@@ -1,9 +1,21 @@
-import { namesManage, SPLICE, OLDIDENT, proxyManage, updateIngs, ResponsiveEvent, UPDATEING } from '../global'
+import { namesManage, SPLICE, OLDIDENT, proxyManage, updateIngs, ResponsiveEvent, UPDATEING, synchroProxy, UPDATE } from '../global'
 import { getNameJoinEvents, isDOM } from '../util'
-import eventManage from './eventManage'
+import eventManage, { updateHandle } from './eventManage'
 import recurRetro from './recurRetro'
 
+const assignment = (target, key, value, currentListName, listNames) => {
+  // 如果卸下原来的代理
+  if (namesManage.has(target[key])) {
+    unListenItem(target[key], currentListName, key)
+  }
 
+  // 如果时重新赋予的对象则再度封装
+  if (value instanceof Object) {
+    target[key] = recurRetro(currentListName, value, listNames.map(({name}) => name), key)
+  } else {
+    target[key] = value
+  }
+}
 
 
 // 单独封装每一项
@@ -20,48 +32,43 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
         return Reflect.set(...arguments);
       }
 
-      // 记录正在修改的状态
-      let vals = updateIngs.get(proxy)
-      if (vals) {
-        vals.push(key)
+      if (~synchroProxy.indexOf(proxy)) {
+        assignment(target, key, value, currentListName, listNames)
+        updateHandle(listNames, {[key]: value})
       } else {
-        vals = [key]
-        updateIngs.set(proxy, vals)
-      }
-      
-      mutualHandle(listNames, key, value, target)
-        .then(ret => {
-          if (ret) {
-            // 如果卸下原来的代理
-            if (namesManage.has(target[key])) {
-              unListenItem(target[key], currentListName, key)
+        // 记录正在修改的状态
+        let vals = updateIngs.get(proxy)
+        if (vals) {
+          vals.push(key)
+        } else {
+          vals = [key]
+          updateIngs.set(proxy, vals)
+        }
+        
+        mutualHandle(listNames, key, value, target)
+          .then(ret => {
+            if (ret) {
+              assignment(target, key, value, currentListName, listNames)
             }
             
-            // 如果时重新赋予的对象则再度封装
-            if (value instanceof Object) {
-              target[key] = recurRetro(currentListName, value, listNames.map(({name}) => name), key)
-            } else {
-              target[key] = value
+            let index = vals.indexOf(key)
+            ~index && vals.splice(index, 1)
+
+            // 如果已经完成了所有修改则通知
+            if (!~vals.indexOf(key)) {
+              let names = listNames.map(({name}) => name)
+              names = names.concat(names.map(name => `${name}${SPLICE}${key}`))
+
+              names.forEach((name) => {
+                ResponsiveEvent.trigger(`${name}${UPDATEING}`)
+              })
             }
-          }
-          
-          let index = vals.indexOf(key)
-          ~index && vals.splice(index, 1)
+            
+            // 删除缓存
+            for (let key in deposit) delete deposit[key]
+          })
 
-          // 如果已经完成了所有修改则通知
-          if (!~vals.indexOf(key)) {
-            let names = listNames.map(({name}) => name)
-            names = names.concat(names.map(name => `${name}${SPLICE}${key}`))
-
-            names.forEach((name) => {
-              ResponsiveEvent.trigger(`${name}${UPDATEING}`)
-            })
-          }
-          
-          // 删除缓存
-          for (let key in deposit) delete deposit[key]
-        })
-
+      }
       return true
     },
     get(target, key) {

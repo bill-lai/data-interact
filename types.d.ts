@@ -60,6 +60,12 @@ export interface API<T> {
   nextTick(callback: UpdateFn): void;
   nextTick(eventName: string, callback: UpdateFn): void;
 
+  
+  /**
+   * @param {isAsync} boolean 
+   */
+  setPattern(isAsync): void
+
   // Get the original proxy without attached API
   origin: T,
   // Get the data before modification, which cannot be modified

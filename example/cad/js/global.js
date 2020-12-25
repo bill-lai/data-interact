@@ -28,5 +28,6 @@ const lines = data.lines.map((line, i) => {
   })
 })
 
+points[0].api.setPattern(false)
 
 export { lines, points }

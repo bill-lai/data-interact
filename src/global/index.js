@@ -12,6 +12,8 @@ export const namesManage = new Map()
 export const proxyManage = new Map()
 // 正在修改的对象映射
 export const updateIngs = new Map()
+// 要求同步的代理
+export const synchroProxy = []
 // 更新通知后缀
 export const UPDATE = 'Update'
 // 正在修改完成后缀

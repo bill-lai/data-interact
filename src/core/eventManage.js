@@ -145,8 +145,7 @@ const mutualManage = (() => {
 
 
 // 完成修改通知
-const updateHandle = (() => {
-
+export const updateHandle = (() => {
   return (names, deposit) => {
     names = combination(names.map(({name}) => name), deposit, false)
     names.forEach(({name}) => {
