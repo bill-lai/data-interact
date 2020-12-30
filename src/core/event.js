@@ -34,7 +34,7 @@ var Event = (function () {
       var cache = _shift.call(args);
       var key = _shift.call(args);
       var stack = cache[key]
-      var ret = { stack: [], ret: true }
+      var ret = { stack: [], ret: true, results: [] }
 
       if (!stack || stack.length === 0) return ret;
 
@@ -44,6 +44,7 @@ var Event = (function () {
           ret.ret = false
           return ret
         } else {
+          ret.results.push(result)
           ret.stack.push(stack[i])
         }
       }
@@ -104,7 +105,7 @@ var Event = (function () {
               stack.splice(i, 1)
             }
           }
-          return ret.ret
+          return { pass: ret.ret, results: ret.results }
         }
       }
 

@@ -9,6 +9,17 @@ const NOFINISHED = 3
 // 通过事件获取最后一个后缀
 const getLastName = name => name.substr(name.lastIndexOf(SPLICE) + SPLICE.length)
 
+// 中途拦截并修改的同步到缓存中
+const updateDeposit = (deposit, results) => {
+  results = results.filter(ret => ret instanceof Object)
+  if (!results.length) return;
+
+  results.forEach(ret => {
+    for (let key in ret) {
+      deposit[key] = ret[key]
+    }
+  })
+}
 
 // 组合事件与key需要监听的事件，并合并所需事件，并组合参数
 const combination = (names, deposit, target) => {
@@ -86,7 +97,12 @@ const mutualManage = (() => {
           let ret = ResponsiveEvent.mutual(name, fns[name]._cache, fns[name]._old_cache)
           fns[name].forEach(fn => fn(ret))
           delete fns[name]
-          ret ? resolve() : reject()
+          if (ret.pass) {
+            updateDeposit(deposit, ret.results)
+            resolve()
+          } else {
+            reject()
+          }
         })
       })
     } else {
@@ -104,10 +120,10 @@ const mutualManage = (() => {
     let emitArgs = combination(originNames, deposit, target)
 
     for (let i = 0; i < emitArgs.length; i++) {
-      
       if (!alreadys.some(({name}) => name === emitArgs[i].name)) {
         let ret = ResponsiveEvent.mutual(emitArgs[i].name, ...emitArgs[i].args)
-        if (!ret) {
+
+        if (!ret.pass) {
           // 如果只是单个属性没完成，则结果为半完成，记录下来，继续其他属性
           if (emitArgs[i].type === OBJEVENT || emitArgs.length === i + 1) {
             return { ret: ERROR };
@@ -123,6 +139,8 @@ const mutualManage = (() => {
 
             return { ret: NOFINISHED,  already }
           }
+        } else {
+          updateDeposit(deposit, ret.results)
         }
       }
     }

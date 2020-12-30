@@ -45,9 +45,14 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
           updateIngs.set(proxy, vals)
         }
         
+        // 发送修改拦截与修改完成通知
         mutualHandle(listNames, key, value, target)
           .then(ret => {
             if (ret) {
+              // 取最新缓存的数字来重新赋予val
+              if (~Object.keys(deposit).indexOf(key)) {
+                value = deposit[key]
+              }
               assignment(target, key, value, currentListName, listNames)
             }
             

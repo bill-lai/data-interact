@@ -1,5 +1,5 @@
 
-interface MutualFn<T> { (args: T): boolean }
+interface MutualFn<T> { (args: T): boolean | T }
 interface UpdateFn { (): void }
 
 export interface API<T> {

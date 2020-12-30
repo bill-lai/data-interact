@@ -54,9 +54,9 @@ line1.points[0].x = 9
 ### API
 |  方法   | 说明  | 回调参数 | 回调应返回 |
 |  ----  | ----  | ---- |  ---- |
-| stop([local], calaabck)  | 拦截指定参数修改 <br> local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 | false \| any |
+| stop([local], calaabck)  | 拦截指定参数修改 <br> local: string 拦截路径, 可选 <br> callback: function 回调函数，可在回调函数中返回对象，该对象key对应修改key时将覆盖上一次的修改，如返回{x: -1} 那么x将永远是-1 | 被修改的对象 | false \| {(key: string): any} |
 | removeStop([local], calaabck)  | 移除拦截函数 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 |
-| onceStop([local], calaabck)  |  拦截一次指定参数修改 <br> local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 | false \| any | 
+| onceStop([local], calaabck)  |  拦截一次指定参数修改 <br> local: string 拦截路径, 可选 <br> callback: function 回调函数，可在回调函数中返回对象，该对象key对应修改key时将覆盖上一次的修改，如返回{x: -1} 那么x将永远是-1 | 被修改的对象 | false \| {(key: string): any} |
 | update([local], calaabck)  | 监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
 | removeUpdate([local], calaabck)  | 移除监听对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 |  
 | onceUpdate([local], calaabck)  | 监听一次对象发生改变时 <br>local: string 拦截路径, 可选 <br> callback: function 回调函数 | 被修改的对象 |
