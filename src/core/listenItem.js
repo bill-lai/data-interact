@@ -49,6 +49,8 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
         mutualHandle(listNames, key, value, target)
           .then(ret => {
             if (ret) {
+              console.log(deposit)
+              // console.log(deposit, key, value, target[key])
               // 取最新缓存的数字来重新赋予val
               if (~Object.keys(deposit).indexOf(key)) {
                 value = deposit[key]
@@ -68,9 +70,6 @@ const _listenItem = (deposit, currentListName, obj, mutualHandle) => {
                 ResponsiveEvent.trigger(`${name}${UPDATEING}`)
               })
             }
-            
-            // 删除缓存
-            for (let key in deposit) delete deposit[key]
           })
 
       }

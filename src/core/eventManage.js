@@ -187,7 +187,6 @@ export default (deposit, target) => {
 
 
   const resulut = (key, resolve, listNames, success) => {
-    
     resolve(success)
 
     // 销栈，依次通知
@@ -210,6 +209,7 @@ export default (deposit, target) => {
     checkStatus = 0
     // 执行等待中的函数
     while (readyFns.length) readyFns.shift()();
+
   }
 
   const handle = async (key, listNames, resolve, alreadys) => {
@@ -275,12 +275,18 @@ export default (deposit, target) => {
           checkStatus = 1
           handle(key, listNames, resolve, [])
         })
-      )
+      ).then(() => {
+        // 所有操作完毕 情况缓存
+        // 删除缓存
+        for (let key in deposit) delete deposit[key]
+      })
     } else {
       return new Promise(resolve => {
         // 缓冲时入栈
         if (!keyFns[key]) keyFns[key] = []
-        keyFns[key].push(r => resolve(r))
+        keyFns[key].push(r => {
+          resolve(r)
+        })
       })
     }
   }

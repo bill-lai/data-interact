@@ -1,6 +1,6 @@
 {
   "name": "data-interact",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Listen to reference data and intercept it asynchronously when modifying data",
   "main": "src/export.js",
   "scripts": {
